@@ -1,4 +1,4 @@
-package com.ptank.brain.world.simpleworld.model;
+package com.ptank.util.gridworld;
 
 import java.util.HashMap;
 
@@ -13,6 +13,18 @@ public class World {
 		SouthWest,
 		West,
 		NorthWest;
+		
+		/**If you imagine the directions as angles (e.g. N == 0 degrees) then this is
+		   the result of combining the two angles (N + N = 0 degrees = N, E + E = 180 degrees = S)
+		   W + W = 540 degrees = 180 degrees = S.
+		   
+		   Another way to think of it is if you were facing direction X and wanted to move
+		   in direction Y where direction Y is relative to the facing direction (e.g. E = east
+		   of my forward direction then the result is the direction you'd actually move)
+		   */ 
+		public Direction combine(Direction input) {
+			return Direction.values()[(this.ordinal() + input.ordinal()) % Direction.values().length]; 
+		}
 	}
 	
 	private int width;
@@ -82,10 +94,14 @@ public class World {
 	}
 	
 	public static void main(String args[]) {
-		System.out.println(new World(30,50));
+		World world = new World(30,50);
+		world.tiles[10][10].addUnit(new Unit('C'));
+		System.out.println(world);		
 		
-		System.out.println();
-		
-		System.out.println(new World(50,30));
+		System.out.println(Direction.North.combine(Direction.North));
+		System.out.println(Direction.North.combine(Direction.South));
+		System.out.println(Direction.East.combine(Direction.North));
+		System.out.println(Direction.East.combine(Direction.East));
+		System.out.println(Direction.West.combine(Direction.West));
 	}
 }

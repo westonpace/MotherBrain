@@ -15,4 +15,13 @@
       </plugin>
     </plugins>
   </build>
+  
+  <dependencies>
+  	<dependency>
+  		<groupId>org.encog</groupId>
+  		<artifactId>encog-core</artifactId>
+  		<version>3.1.0</version>
+  	</dependency>
+  </dependencies> 
+  
 </project>
