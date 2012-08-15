@@ -32,11 +32,17 @@ public class MouseEyes implements NeuralInput {
 		int tileIndex = 0;
 		while(tileIterator.hasNext()) {
 			Tile tile = tileIterator.next();
-			for(int i = 0; i < knownObjects.length; i++) {
-				Class<?> obj = knownObjects[i];
-				if(tile.getUnitOnTile() != null && obj.isAssignableFrom(tile.getUnitOnTile().getClass())) {
-					set(result,i,tileIndex);
+			if(tile.isOccupied()) {
+				for(int i = 0; i < knownObjects.length; i++) {
+					Class<?> obj = knownObjects[i];
+					if(tile.getUnitOnTile() != null && obj.isAssignableFrom(tile.getUnitOnTile().getClass())) {
+						set(result,i,tileIndex);
+						break;
+					}
 				}
+			} else if(!tile.isPassable()) {
+				//In this case we're seeing a wall
+				set(result,knownObjects.length,tileIndex);
 			}
 			tileIndex++;
 		}
@@ -48,8 +54,8 @@ public class MouseEyes implements NeuralInput {
 	}
 	
 	public int size() {
-		//Each of the objects could be seen in one of 8 squares.
-		return knownObjects.length*8;
+		//Each of the objects (plus a wall) could be seen in one of 8 squares.
+		return (knownObjects.length+1)*8;
 	}
 	
 	/**     3
