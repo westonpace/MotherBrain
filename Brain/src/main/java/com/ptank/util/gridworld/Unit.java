@@ -7,10 +7,19 @@ public class Unit {
 
 	private char textualRepresentation;
 	
-	public Event<UnitCollisionEvent> unitCollisionEvent = new Event<UnitCollisionEvent>();
+	public Event<UnitCollisionEvent> collisionEvent = new Event<UnitCollisionEvent>();
+	public Event<UnitMoveEvent> moveEvent = new Event<UnitMoveEvent>();
 	
 	public Unit(char textualRepresentation) {
 		this.textualRepresentation = textualRepresentation;
+	}
+	
+	public void place(Tile destination) {
+		if(!destination.isPassable()) {
+			throw new RuntimeException("Unit can't be placed on an unpassable tile");
+		}
+		destination.addUnit(this);
+		moveEvent.fireEvent(new UnitMoveEvent(null,destination));
 	}
 	
 	public void move(Tile source, Direction direction) {
@@ -18,13 +27,14 @@ public class Unit {
 		if(newTile.isPassable()) {
 			if(newTile.isOccupied()) {
 				Unit collidedWith = newTile.getUnitOnTile();
-				unitCollisionEvent.fireEvent(new UnitCollisionEvent(this, collidedWith));
+				collisionEvent.fireEvent(new UnitCollisionEvent(this, collidedWith));
 			} else {
 				source.removeUnit(this);
 				newTile.addUnit(this);
+				moveEvent.fireEvent(new UnitMoveEvent(source, newTile));
 			}
 		} else {
-			unitCollisionEvent.fireEvent(new UnitCollisionEvent(this));
+			collisionEvent.fireEvent(new UnitCollisionEvent(this));
 		}
 	}
 	

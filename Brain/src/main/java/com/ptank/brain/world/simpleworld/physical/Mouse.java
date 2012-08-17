@@ -14,7 +14,7 @@ public class Mouse extends FacingUnit implements EventListener<UnitCollisionEven
 	
 	public Mouse() {
 		super('M');
-		unitCollisionEvent.addListener(this);
+		collisionEvent.addListener(this);
 	}
 
 	@Override

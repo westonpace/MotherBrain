@@ -11,6 +11,8 @@ public class Tile {
 	private Map<Direction,Tile> neighbors;
 	private List<Unit> unitsOnTile = new ArrayList<Unit>();
 	private TileType tileType;
+	private int xPos;
+	private int yPos;
 	
 	public enum TileType {
 		NorthEastWall,
@@ -24,8 +26,17 @@ public class Tile {
 		OpenSpace;
 	}
 	
-	public Tile() {
-		
+	public Tile(int xPos, int yPos) {
+		this.xPos = xPos;
+		this.yPos = yPos;
+	}
+	
+	public int getX() {
+		return xPos;
+	}
+	
+	public int getY() {
+		return yPos;
 	}
 	
 	public void setNeighbors(Map<Direction,Tile> neighbors) {

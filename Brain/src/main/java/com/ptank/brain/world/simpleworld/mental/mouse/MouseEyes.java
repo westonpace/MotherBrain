@@ -8,18 +8,33 @@ import java.util.NoSuchElementException;
 import com.ptank.brain.world.simpleworld.physical.Bread;
 import com.ptank.brain.world.simpleworld.physical.Cat;
 import com.ptank.brain.world.simpleworld.physical.Mouse;
+import com.ptank.util.event.Event.EventListener;
 import com.ptank.util.gridworld.Tile;
+import com.ptank.util.gridworld.UnitMoveEvent;
 import com.ptank.util.gridworld.World.Direction;
 
-public class MouseEyes implements NeuralInput {
+public class MouseEyes implements NeuralInput,EventListener<UnitMoveEvent> {
 
 	private Mouse mouse;
 	private Tile currentTile;
 	
-	private static final Class<?>[] knownObjects = {Mouse.class,Cat.class,Bread.class};
+	public enum VisualInput {
+		Mouse,
+		Cat,
+		Bread,
+		Wall;
+	}
 	
 	public MouseEyes(Mouse mouse) {
 		this.mouse = mouse;
+		this.currentTile = null;
+		mouse.moveEvent.addListener(this);
+	}
+	
+	public MouseEyes(Mouse mouse, Tile currentTile) {
+		this.mouse = mouse;
+		this.currentTile = currentTile;
+		mouse.moveEvent.addListener(this);
 	}
 
 	@Override
@@ -32,50 +47,101 @@ public class MouseEyes implements NeuralInput {
 		int tileIndex = 0;
 		while(tileIterator.hasNext()) {
 			Tile tile = tileIterator.next();
-			if(tile.isOccupied()) {
-				for(int i = 0; i < knownObjects.length; i++) {
-					Class<?> obj = knownObjects[i];
-					if(tile.getUnitOnTile() != null && obj.isAssignableFrom(tile.getUnitOnTile().getClass())) {
-						set(result,i,tileIndex);
-						break;
-					}
+			VisualInput visualInput = null;
+			if(tile != null && tile.isOccupied()) {
+				if(tile.getUnitOnTile() instanceof Cat) {
+					visualInput = VisualInput.Cat;
+				} else if (tile.getUnitOnTile() instanceof Mouse) {
+					visualInput = VisualInput.Mouse;
+				} else if (tile.getUnitOnTile() instanceof Bread) {
+					visualInput = VisualInput.Bread;
+				} else {
+					throw new RuntimeException("Don't know how to visually interpret: " + tile.getUnitOnTile().getClass().getSimpleName());
 				}
-			} else if(!tile.isPassable()) {
-				//In this case we're seeing a wall
-				set(result,knownObjects.length,tileIndex);
+			} else if(tile == null || !tile.isPassable()) {
+				visualInput = VisualInput.Wall;
+			}
+			if(visualInput != null) {
+				set(result,visualInput.ordinal(),tileIndex);
 			}
 			tileIndex++;
 		}
 		return result;
 	}
 	
+	private int indexOfPath(Direction [] path) {
+		int pathIndex = -1;
+		for(int j = 0; j < TileIterator.directions.length; j++) {
+			Direction [] nextPath = TileIterator.directions[j];
+			if(nextPath.length == path.length) {
+				boolean matches = true;
+				for(int i = 0; i < nextPath.length; i++) {
+					if(!path[i].equals(nextPath[i])) {
+						matches = false;
+					}
+				}
+				if(matches) {
+					pathIndex = j;
+					break;
+				}
+			}
+		}
+		return pathIndex;
+	}
+	
+	public int getNeuralIndex(VisualInput input, Direction[] path) {
+		int pathIndex = indexOfPath(path);
+		if(pathIndex == -1) {
+			return -1;
+		}
+		return getNeuralIndex(input.ordinal(), pathIndex);
+	}
+	
+	private int getNeuralIndex(int visualIndex, int pathIndex) {
+		return visualIndex*numSquares()+pathIndex;
+	}
+	
+	private int numSquares() {
+		return TileIterator.directions.length;
+	}
+	
+	private int numObjects() {
+		return VisualInput.values().length;
+	}
+	
 	private void set(List<Double> list, int objectIndex, int squareIndex) {
-		list.set(objectIndex*8+squareIndex,1.0);
+		list.set(getNeuralIndex(objectIndex,squareIndex),1.0);
 	}
 	
 	public int size() {
 		//Each of the objects (plus a wall) could be seen in one of 8 squares.
-		return (knownObjects.length+1)*8;
+		return numObjects()*numSquares();
 	}
 	
-	/**     3
-	 *     24
-	 *    X15     --> N
-	 *     86
-	 *      7
-	 */
-	private static class TileIterator implements Iterator<Tile> {
+	public static class TileIterator implements Iterator<Tile> {
 
 		private Direction baseDirection;
-		private Tile currentTile;
-		private static final Direction [] directions = {Direction.North,Direction.West,Direction.NorthWest,
-				                                        Direction.East,Direction.East,Direction.East,
-				                                        Direction.East,Direction.SouthWest};
+		private Tile startTile;
+		/**  
+		 * 
+		 *       34567
+		 *        218
+		 *         X
+		 * 
+		 */
+		private static final Direction [][] directions = {{Direction.North},
+			                                              {Direction.NorthWest},
+			                                              {Direction.NorthWest,Direction.NorthWest},
+			                                              {Direction.NorthWest,Direction.North},
+			                                              {Direction.North,Direction.North},
+			                                              {Direction.North,Direction.NorthEast},
+			                                              {Direction.NorthEast,Direction.NorthEast},
+			                                              {Direction.NorthEast}};
 		private int currentIndex = 0;
 		
 		public TileIterator(Direction baseDirection, Tile startingTile) {
 			this.baseDirection = baseDirection;
-			this.currentTile = startingTile;
+			this.startTile = startingTile;
 		}
 		
 		@Override
@@ -88,8 +154,14 @@ public class MouseEyes implements NeuralInput {
 			if(!hasNext()) {
 				throw new NoSuchElementException();
 			}
-			Direction toMove = baseDirection.combine(directions[currentIndex]);
-			currentTile = currentTile.getNeighbor(toMove);
+			Tile currentTile = startTile;
+			for(Direction direction : directions[currentIndex]) {
+				Direction combinedDirection = direction.combine(baseDirection);
+				currentTile = currentTile.getNeighbor(combinedDirection);
+				if(currentTile == null) {
+					break;
+				}
+			}
 			currentIndex++;
 			return currentTile;
 		}
@@ -99,6 +171,11 @@ public class MouseEyes implements NeuralInput {
 			throw new RuntimeException("Operation not implemented");
 		}
 
+	}
+
+	@Override
+	public void onEvent(UnitMoveEvent event) {
+		currentTile = event.getDestination();
 	}
 	
 }

@@ -35,42 +35,54 @@ public class World {
 	public World(int width, int height) {
 		this.width = width;
 		this.height = height;
-		tiles = new Tile[width][height];
-		for(int i = 0; i < width; i++) {
-			for(int j = 0; j < height; j++) {
-				tiles[i][j] = new Tile();
+		tiles = new Tile[height][width];
+		for(int i = 0; i < height; i++) {
+			for(int j = 0; j < width; j++) {
+				tiles[i][j] = new Tile(j,i);
 			}
 		}
 		updateTileNeighbors();
 	}
 	
+	public int getWidth() {
+		return width;
+	}
+	
+	public int getHeight() {
+		return height;
+	}
+	
+	public Tile getTile(int x, int y) {
+		return tiles[y][x];
+	}
+	
 	private void updateTileNeighbors() {
-		for(int i = 0; i < width; i++) {
-			for(int j = 0; j < height; j++) {
+		for(int i = 0; i < height; i++) {
+			for(int j = 0; j < width; j++) {
 				HashMap<Direction,Tile> neighbors = new HashMap<Direction,Tile>();
 				if(i > 0 && j > 0) {
 					neighbors.put(Direction.NorthWest,tiles[i-1][j-1]);
 				}
-				if(i > 0) {
-					neighbors.put(Direction.West,tiles[i-1][j]);
-				}
-				if(i > 0 && j < height - 1) {
-					neighbors.put(Direction.SouthWest,tiles[i-1][j+1]);
-				}
 				if(j > 0) {
-					neighbors.put(Direction.North,tiles[i][j-1]);
+					neighbors.put(Direction.West,tiles[i][j-1]);
 				}
-				if(j > 0 && i < width - 1) {
-					neighbors.put(Direction.NorthEast,tiles[i+1][j-1]);
+				if(i < height - 1 && j > 0) {
+					neighbors.put(Direction.SouthWest,tiles[i+1][j-1]);
 				}
-				if(i < width - 1) {
-					neighbors.put(Direction.East,tiles[i+1][j]);
+				if(i > 0) {
+					neighbors.put(Direction.North,tiles[i-1][j]);
 				}
-				if(i < width - 1 && j < height - 1) {
+				if(j < width - 1 && i > 0) {
+					neighbors.put(Direction.NorthEast,tiles[i-1][j+1]);
+				}
+				if(j < width - 1) {
+					neighbors.put(Direction.East,tiles[i][j+1]);
+				}
+				if(i < height - 1 && j < width - 1) {
 					neighbors.put(Direction.SouthEast,tiles[i+1][j+1]);
 				}
-				if(j < height - 1) {
-					neighbors.put(Direction.South,tiles[i][j+1]);
+				if(i < height - 1) {
+					neighbors.put(Direction.South,tiles[i+1][j]);
 				}
 				for(Direction direction : Direction.values()) {
 					if(!neighbors.containsKey(direction)) {
@@ -86,7 +98,7 @@ public class World {
 		StringBuilder resultBuilder = new StringBuilder();
 		for(int i = 0; i < height; i++) {
 			for(int j = 0; j < width; j++) {
-				resultBuilder.append(tiles[j][i]);
+				resultBuilder.append(tiles[i][j]);
 			}
 			resultBuilder.append("\n");
 		}
