@@ -23,7 +23,7 @@ public class Mouse extends FacingUnit implements EventListener<UnitCollisionEven
 			score -= pointsLostOnWallCollision;
 		} else if (event.getOtherUnit() instanceof Cat) {
 			score -= pointsLostOnCatCollision;
-		} else if (event.getOtherUnit() instanceof Bread) {
+		} else if (event.getOtherUnit() instanceof Cheese) {
 			score += pointsGainedOnCheeseEating;
 		}
 	}

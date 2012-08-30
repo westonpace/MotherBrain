@@ -5,14 +5,24 @@ import java.util.HashMap;
 public class World {
 
 	public enum Direction {
-		North,
-		NorthEast,
-		East,
-		SouthEast,
-		South,
-		SouthWest,
-		West,
-		NorthWest;
+		North("N"),
+		NorthEast("NE"),
+		East("E"),
+		SouthEast("SE"),
+		South("S"),
+		SouthWest("SW"),
+		West("W"),
+		NorthWest("NW");
+		
+		private String shortString;
+		
+		private Direction(String shortString) {
+			this.shortString = shortString;
+		}
+		
+		public String getShortString() {
+			return shortString;
+		}
 		
 		/**If you imagine the directions as angles (e.g. N == 0 degrees) then this is
 		   the result of combining the two angles (N + N = 0 degrees = N, E + E = 180 degrees = S)
@@ -54,6 +64,14 @@ public class World {
 	
 	public Tile getTile(int x, int y) {
 		return tiles[y][x];
+	}
+	
+	public void clear() {
+		for(int i = 0; i < height; i++) {
+			for(int j = 0; j < width; j++) {
+				tiles[i][j].clear();
+			}
+		}
 	}
 	
 	private void updateTileNeighbors() {

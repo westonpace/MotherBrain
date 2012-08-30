@@ -7,8 +7,8 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.ptank.brain.world.simpleworld.mental.mouse.MouseEyes;
-import com.ptank.brain.world.simpleworld.mental.mouse.MouseEyes.TileIterator;
+import com.ptank.brain.world.simpleworld.mental.mouse.MouseVisualCortex;
+import com.ptank.brain.world.simpleworld.mental.mouse.MouseVisualCortex.TileIterator;
 import com.ptank.brain.world.simpleworld.physical.Cat;
 import com.ptank.brain.world.simpleworld.physical.Mouse;
 import com.ptank.util.gridworld.Tile;
@@ -36,16 +36,16 @@ public class MouseEyesTest {
 		Mouse mouse = new Mouse();
 		Tile mouseTile = world.getTile(2,2);
 		
-		MouseEyes mouseEyes = new MouseEyes(mouse);
+		MouseVisualCortex mouseEyes = new MouseVisualCortex(mouse);
 		mouse.place(mouseTile);
 		
 		Assert.assertTrue(compareDoubles(sumArray(mouseEyes.getNextInput()),5.0));
 
-		mouse.move(mouseTile,Direction.North);
+		mouse.move(Direction.North);
 
 		Assert.assertTrue(compareDoubles(sumArray(mouseEyes.getNextInput()),8.0));
 		
-		mouse.move(world.getTile(2,1),Direction.South);
+		mouse.move(Direction.South);
 		
 		Cat cat = new Cat();
 		cat.place(world.getTile(2, 1));

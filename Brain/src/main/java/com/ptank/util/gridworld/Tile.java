@@ -68,6 +68,10 @@ public class Tile {
 		return unitsOnTile.get(0);
 	}
 	
+	public void clear() {
+		unitsOnTile.clear();
+	}
+	
 	private TileType getTileType() {
 		if(neighbors.get(Direction.North) == null && neighbors.get(Direction.West) == null) {
 			return TileType.NorthWestWall;

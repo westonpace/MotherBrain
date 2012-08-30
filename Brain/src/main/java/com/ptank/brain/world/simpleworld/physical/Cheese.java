@@ -2,9 +2,9 @@ package com.ptank.brain.world.simpleworld.physical;
 
 import com.ptank.util.gridworld.Unit;
 
-public class Bread extends Unit {
+public class Cheese extends Unit {
 
-	public Bread() {
+	public Cheese() {
 		super('B');
 	}
 

@@ -24,5 +24,9 @@ public class Event<T> {
 			listener.onEvent(event);
 		}
 	}
+
+	public void removeAllListeners() {
+		listeners.clear();
+	}
 	
 }

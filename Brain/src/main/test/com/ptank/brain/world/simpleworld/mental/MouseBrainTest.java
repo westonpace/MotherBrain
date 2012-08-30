@@ -7,8 +7,8 @@ import org.junit.Test;
 
 import com.ptank.brain.neural.core.WeightSource;
 import com.ptank.brain.world.simpleworld.mental.mouse.MouseBrain;
-import com.ptank.brain.world.simpleworld.mental.mouse.MouseEyes;
-import com.ptank.brain.world.simpleworld.mental.mouse.MouseMotorControl;
+import com.ptank.brain.world.simpleworld.mental.mouse.MouseVisualCortex;
+import com.ptank.brain.world.simpleworld.mental.mouse.MouseCerebellum;
 import com.ptank.brain.world.simpleworld.physical.Mouse;
 import com.ptank.util.gridworld.Tile;
 import com.ptank.util.gridworld.World;
@@ -24,8 +24,8 @@ public class MouseBrainTest {
 		Mouse mouse = new Mouse();
 		Tile mouseTile = world.getTile(2,2);
 		
-		MouseEyes mouseEyes = new MouseEyes(mouse);
-		MouseMotorControl motorControl = new MouseMotorControl(mouse);
+		MouseVisualCortex mouseEyes = new MouseVisualCortex(mouse);
+		MouseCerebellum motorControl = new MouseCerebellum(mouse);
 		MouseBrain mouseBrain = new MouseBrain(mouse, mouseEyes, motorControl);
 		mouse.place(mouseTile);
 

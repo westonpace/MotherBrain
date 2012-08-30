@@ -11,8 +11,8 @@ import org.encog.neural.networks.layers.BasicLayer;
 import com.ptank.brain.neural.core.RandomWeightSource;
 import com.ptank.brain.neural.core.WeightSource;
 import com.ptank.brain.world.simpleworld.SimpleWorldBrain;
-import com.ptank.brain.world.simpleworld.mental.mouse.MouseEyes.VisualInput;
-import com.ptank.brain.world.simpleworld.mental.mouse.MouseMotorControl.MouseMove;
+import com.ptank.brain.world.simpleworld.mental.mouse.MouseVisualCortex.VisualInput;
+import com.ptank.brain.world.simpleworld.mental.mouse.MouseCerebellum.MouseMove;
 import com.ptank.brain.world.simpleworld.physical.Mouse;
 import com.ptank.util.encog.EncogUtils;
 import com.ptank.util.gridworld.Unit;
@@ -21,12 +21,12 @@ import com.ptank.util.gridworld.World.Direction;
 public class MouseBrain implements SimpleWorldBrain<Unit> {
 
 	private Mouse body;
-	private MouseEyes eyes;
-	private MouseMotorControl motorControl;
+	private MouseVisualCortex eyes;
+	private MouseCerebellum motorControl;
 	private BasicNetwork prefrontalCortex;
 	private WeightSource weightSource = new RandomWeightSource();
 	
-	public MouseBrain(Mouse body, MouseEyes eyes, MouseMotorControl motorControl) {
+	public MouseBrain(Mouse body, MouseVisualCortex eyes, MouseCerebellum motorControl) {
 		this.body = body;
 		this.eyes = eyes;
 		this.motorControl = motorControl;
@@ -84,7 +84,19 @@ public class MouseBrain implements SimpleWorldBrain<Unit> {
 	}
 	
 	public String toString() {
-		return prefrontalCortex.dumpWeights();
+		StringBuilder result = new StringBuilder();
+		for(int outputIndex = 0; outputIndex < prefrontalCortex.getOutputCount(); outputIndex++) {
+			result.append(motorControl.getNameOfIndex(outputIndex));
+			result.append(":\n");
+			for(int inputIndex = 0; inputIndex < prefrontalCortex.getInputCount(); inputIndex++) {
+				result.append("\t");
+				result.append(prefrontalCortex.getWeight(0, inputIndex, outputIndex));
+				result.append(" - ");
+				result.append(eyes.getNameOfIndex(inputIndex));
+				result.append("\n");
+			}
+		}
+		return result.toString();
 	}
 	
 }

@@ -13,20 +13,20 @@ import com.ptank.util.gridworld.World.Direction;
 /**
  * Translates a set of neurons into mouse movement.
  */
-public class MouseMotorControl implements NeuralOutput,EventListener<UnitMoveEvent> {
+public class MouseCerebellum implements NeuralOutput,EventListener<UnitMoveEvent> {
 
-	private static Logger logger = Logger.getLogger(MouseMotorControl.class);
+	private static Logger logger = Logger.getLogger(MouseCerebellum.class);
 	
 	private Mouse mouse;
 	private Tile currentTile;
 	
-	public MouseMotorControl(Mouse mouse) {
+	public MouseCerebellum(Mouse mouse) {
 		this.mouse = mouse;
 		this.currentTile = null;
 		mouse.moveEvent.addListener(this);
 	}
 	
-	public MouseMotorControl(Mouse mouse, Tile currentTile) {
+	public MouseCerebellum(Mouse mouse, Tile currentTile) {
 		this.mouse = mouse;
 		this.currentTile = currentTile;
 		mouse.moveEvent.addListener(this);
@@ -37,6 +37,10 @@ public class MouseMotorControl implements NeuralOutput,EventListener<UnitMoveEve
 		ROTATE_RIGHT,
 		MOVE_FORWARD,
 		MOVE_BACKWARD;
+	}
+	
+	public String getNameOfIndex(int index) {
+		return MouseMove.values()[index].toString();
 	}
 	
 	@Override
@@ -68,12 +72,12 @@ public class MouseMotorControl implements NeuralOutput,EventListener<UnitMoveEve
 		case MOVE_BACKWARD:
 			logger.debug("Moving Backwards");
 			moveDirection = mouse.getFacingDirection().combine(Direction.South);
-			mouse.move(currentTile, moveDirection);
+			mouse.move(moveDirection);
 			break;
 		case MOVE_FORWARD:
 			logger.debug("Moving Forwards");
 			moveDirection = mouse.getFacingDirection().combine(Direction.North);
-			mouse.move(currentTile, moveDirection);
+			mouse.move(moveDirection);
 			break;
 		case ROTATE_LEFT:
 			logger.debug("Turning Left");

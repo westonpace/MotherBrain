@@ -1,8 +1,8 @@
 package com.ptank.brain.world.simpleworld.test;
 
 import com.ptank.brain.world.simpleworld.mental.mouse.MouseBrain;
-import com.ptank.brain.world.simpleworld.mental.mouse.MouseEyes;
-import com.ptank.brain.world.simpleworld.mental.mouse.MouseMotorControl;
+import com.ptank.brain.world.simpleworld.mental.mouse.MouseVisualCortex;
+import com.ptank.brain.world.simpleworld.mental.mouse.MouseCerebellum;
 import com.ptank.brain.world.simpleworld.physical.Mouse;
 
 public class DataBuilder {
@@ -11,18 +11,18 @@ public class DataBuilder {
 		return new Mouse();
 	}
 	
-	public MouseEyes buildMouseEyes(Mouse mouse) {
-		return new MouseEyes(buildMouse());
+	public MouseVisualCortex buildMouseEyes(Mouse mouse) {
+		return new MouseVisualCortex(buildMouse());
 	}
 	
-	public MouseMotorControl buildMouseMotorControl() {
-		return new MouseMotorControl(buildMouse());
+	public MouseCerebellum buildMouseMotorControl() {
+		return new MouseCerebellum(buildMouse());
 	}
 	
 	public MouseBrain buildRandomMouseBrain() {
 		Mouse mouse = buildMouse();
-		MouseEyes eyes = new MouseEyes(mouse);
-		MouseMotorControl motorControl = new MouseMotorControl(mouse);
+		MouseVisualCortex eyes = new MouseVisualCortex(mouse);
+		MouseCerebellum motorControl = new MouseCerebellum(mouse);
 		MouseBrain result = new MouseBrain(mouse,eyes,motorControl);
 		return result;
 	}

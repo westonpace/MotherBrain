@@ -5,7 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import com.ptank.brain.world.simpleworld.physical.Bread;
+import com.ptank.brain.world.simpleworld.physical.Cheese;
 import com.ptank.brain.world.simpleworld.physical.Cat;
 import com.ptank.brain.world.simpleworld.physical.Mouse;
 import com.ptank.util.event.Event.EventListener;
@@ -13,25 +13,18 @@ import com.ptank.util.gridworld.Tile;
 import com.ptank.util.gridworld.UnitMoveEvent;
 import com.ptank.util.gridworld.World.Direction;
 
-public class MouseEyes implements NeuralInput,EventListener<UnitMoveEvent> {
+public class MouseVisualCortex implements NeuralInput,EventListener<UnitMoveEvent> {
 
 	private Mouse mouse;
 	private Tile currentTile;
-	
-	public enum VisualInput {
-		Mouse,
-		Cat,
-		Bread,
-		Wall;
-	}
-	
-	public MouseEyes(Mouse mouse) {
+		
+	public MouseVisualCortex(Mouse mouse) {
 		this.mouse = mouse;
 		this.currentTile = null;
 		mouse.moveEvent.addListener(this);
 	}
 	
-	public MouseEyes(Mouse mouse, Tile currentTile) {
+	public MouseVisualCortex(Mouse mouse, Tile currentTile) {
 		this.mouse = mouse;
 		this.currentTile = currentTile;
 		mouse.moveEvent.addListener(this);
@@ -53,8 +46,8 @@ public class MouseEyes implements NeuralInput,EventListener<UnitMoveEvent> {
 					visualInput = VisualInput.Cat;
 				} else if (tile.getUnitOnTile() instanceof Mouse) {
 					visualInput = VisualInput.Mouse;
-				} else if (tile.getUnitOnTile() instanceof Bread) {
-					visualInput = VisualInput.Bread;
+				} else if (tile.getUnitOnTile() instanceof Cheese) {
+					visualInput = VisualInput.Cheese;
 				} else {
 					throw new RuntimeException("Don't know how to visually interpret: " + tile.getUnitOnTile().getClass().getSimpleName());
 				}
@@ -118,6 +111,33 @@ public class MouseEyes implements NeuralInput,EventListener<UnitMoveEvent> {
 		return numObjects()*numSquares();
 	}
 	
+	private int getVisualIndex(int totalIndex) {
+		return totalIndex / numSquares();
+	}
+	
+	private int getPathIndex(int totalIndex) {
+		return totalIndex % numSquares();
+	}
+	
+	public String getNameOfIndex(int index) {
+		return VisualInput.values()[getVisualIndex(index)].toString() + "@" + directionPathToString(getPathIndex(index));
+	}
+	
+	private String directionPathToString(int pathIndex) {
+		Direction [] path = TileIterator.directions[pathIndex];
+		StringBuilder result = new StringBuilder();
+		for(Direction direction : path) {
+			result.append(direction.getShortString());
+			result.append(".");
+		}
+		return result.toString();
+	}
+	
+	@Override
+	public void onEvent(UnitMoveEvent event) {
+		currentTile = event.getDestination();
+	}
+	
 	public static class TileIterator implements Iterator<Tile> {
 
 		private Direction baseDirection;
@@ -173,9 +193,4 @@ public class MouseEyes implements NeuralInput,EventListener<UnitMoveEvent> {
 
 	}
 
-	@Override
-	public void onEvent(UnitMoveEvent event) {
-		currentTile = event.getDestination();
-	}
-	
 }

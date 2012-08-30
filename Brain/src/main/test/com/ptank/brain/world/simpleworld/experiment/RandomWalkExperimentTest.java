@@ -1,20 +1,14 @@
 package com.ptank.brain.world.simpleworld.experiment;
 
-import java.io.IOException;
-
-import org.junit.Before;
 import org.junit.Test;
 
+import com.ptank.brain.world.simpleworld.SimpleWorld;
 import com.ptank.brain.world.simpleworld.mental.mouse.MouseBrain;
+import com.ptank.brain.world.simpleworld.test.BaseTest;
+import com.ptank.brain.world.simpleworld.test.BaseTest.ExternalDebug;
 import com.ptank.brain.world.simpleworld.test.DataBuilder;
-import com.ptank.util.gridworld.World;
 
-public class RandomWalkExperimentTest {
-
-	@Before
-	public void hookupVisualVM() throws IOException {
-		System.in.read();
-	}
+public class RandomWalkExperimentTest extends BaseTest {
 	
 	@Test
 	public void test() {
@@ -23,16 +17,26 @@ public class RandomWalkExperimentTest {
 		
 		MouseBrain worstEver = null;
 		
-		for(int i = 0; i < 50; i++) {
+		int NUM_EXPERIMENTS = 1000;
+		
+		SimpleWorld world = new SimpleWorld(100,100);
+		long startTime = System.currentTimeMillis();
+		for(int i = 0; i < NUM_EXPERIMENTS; i++) {
 			MouseBrain mouseBrain = db.buildRandomMouseBrain();
-			World world = new World(100,100);
-			FixedLengthRandomWalkExperiment test = new FixedLengthRandomWalkExperiment(mouseBrain,world);
+			world.setMouse(mouseBrain);
+			world.start();
+			FixedLengthRandomWalkExperiment test = new FixedLengthRandomWalkExperiment(world);
 			test.runExperiment();
 			if(worstEver == null || mouseBrain.getBody().getScore() < worstEver.getBody().getScore()) {
 				worstEver = mouseBrain;
 			}
 			System.out.println("Test: " + i + " -- " + mouseBrain.getBody().getScore());
+			world.clear();
 		}
+		long endTime = System.currentTimeMillis();
+		long totalTime = endTime - startTime;
+		double timePerExperiment = totalTime / NUM_EXPERIMENTS;
+		System.out.println(timePerExperiment + " ms per experiment");
 		
 		System.out.println("Worst Ever Brain: " + worstEver);
 	}

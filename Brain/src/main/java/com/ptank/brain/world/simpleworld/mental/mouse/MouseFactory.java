@@ -6,8 +6,8 @@ public class MouseFactory {
 
 	public MouseBrain buildMouseBrain() {
 		Mouse mouse = new Mouse();
-		MouseEyes mouseEyes = new MouseEyes(mouse);
-		MouseMotorControl motorControl = new MouseMotorControl(mouse);
+		MouseVisualCortex mouseEyes = new MouseVisualCortex(mouse);
+		MouseCerebellum motorControl = new MouseCerebellum(mouse);
 		MouseBrain brain = new MouseBrain(mouse,mouseEyes,motorControl);
 		return brain;
 	}

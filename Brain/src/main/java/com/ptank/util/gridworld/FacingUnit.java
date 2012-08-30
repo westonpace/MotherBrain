@@ -16,9 +16,9 @@ public class FacingUnit extends Unit {
 	 * relative to the direction you are facing.  In other words, N = move forwards
 	 * and S = move backwards.  East and west represent strafing left and right.
 	 */
-	public void relativeMove(Tile source, Direction direction) {
+	public void relativeMove(Direction direction) {
 		Direction trueDirectionToMove = facingDirection.combine(direction);
-		move(source, trueDirectionToMove);
+		move(trueDirectionToMove);
 	}
 
 	public Direction getFacingDirection() {
