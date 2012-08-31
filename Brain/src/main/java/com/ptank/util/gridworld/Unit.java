@@ -46,6 +46,10 @@ public class Unit {
 		}
 	}
 	
+	public Tile getCurrentTile() {
+		return tile;
+	}
+	
 	public char getTextualRepresentation() {
 		return textualRepresentation;
 	}

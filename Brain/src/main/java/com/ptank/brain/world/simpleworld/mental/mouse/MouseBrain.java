@@ -10,8 +10,8 @@ import org.encog.neural.networks.layers.BasicLayer;
 
 import com.ptank.brain.neural.core.RandomWeightSource;
 import com.ptank.brain.neural.core.WeightSource;
+import com.ptank.brain.world.simpleworld.Eyes.VisualInput;
 import com.ptank.brain.world.simpleworld.SimpleWorldBrain;
-import com.ptank.brain.world.simpleworld.mental.mouse.MouseVisualCortex.VisualInput;
 import com.ptank.brain.world.simpleworld.mental.mouse.MouseCerebellum.MouseMove;
 import com.ptank.brain.world.simpleworld.physical.Mouse;
 import com.ptank.util.encog.EncogUtils;

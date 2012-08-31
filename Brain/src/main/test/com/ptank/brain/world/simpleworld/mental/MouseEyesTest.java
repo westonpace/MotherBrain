@@ -7,8 +7,8 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.ptank.brain.world.simpleworld.mental.mouse.MouseEyes.TileIterator;
 import com.ptank.brain.world.simpleworld.mental.mouse.MouseVisualCortex;
-import com.ptank.brain.world.simpleworld.mental.mouse.MouseVisualCortex.TileIterator;
 import com.ptank.brain.world.simpleworld.physical.Cat;
 import com.ptank.brain.world.simpleworld.physical.Mouse;
 import com.ptank.util.gridworld.Tile;
