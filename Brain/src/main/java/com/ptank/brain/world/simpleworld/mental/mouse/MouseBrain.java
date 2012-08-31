@@ -10,9 +10,11 @@ import org.encog.neural.networks.layers.BasicLayer;
 
 import com.ptank.brain.neural.core.RandomWeightSource;
 import com.ptank.brain.neural.core.WeightSource;
+import com.ptank.brain.world.simpleworld.Eyes;
 import com.ptank.brain.world.simpleworld.Eyes.VisualInput;
+import com.ptank.brain.world.simpleworld.MotorControl;
+import com.ptank.brain.world.simpleworld.MotorControl.Action;
 import com.ptank.brain.world.simpleworld.SimpleWorldBrain;
-import com.ptank.brain.world.simpleworld.mental.mouse.MouseCerebellum.MouseMove;
 import com.ptank.brain.world.simpleworld.physical.Mouse;
 import com.ptank.util.encog.EncogUtils;
 import com.ptank.util.gridworld.Unit;
@@ -21,32 +23,32 @@ import com.ptank.util.gridworld.World.Direction;
 public class MouseBrain implements SimpleWorldBrain<Unit> {
 
 	private Mouse body;
-	private MouseVisualCortex eyes;
-	private MouseCerebellum motorControl;
+	private MouseVisualCortex visualCortex;
+	private MouseCerebellum cerebellum;
 	private BasicNetwork prefrontalCortex;
 	private WeightSource weightSource = new RandomWeightSource();
 	
-	public MouseBrain(Mouse body, MouseVisualCortex eyes, MouseCerebellum motorControl) {
+	public MouseBrain(Mouse body, MouseVisualCortex visualCortex, MouseCerebellum cerebellum) {
 		this.body = body;
-		this.eyes = eyes;
-		this.motorControl = motorControl;
+		this.visualCortex = visualCortex;
+		this.cerebellum = cerebellum;
 		initialize();
 	}
 
 	private void initializeStructure() {
 		prefrontalCortex = new BasicNetwork();
-		prefrontalCortex.addLayer(new BasicLayer(null,true,eyes.size()));
-		prefrontalCortex.addLayer(new BasicLayer(new ActivationSigmoid(),false,motorControl.size()));
+		prefrontalCortex.addLayer(new BasicLayer(null,true,visualCortex.size()));
+		prefrontalCortex.addLayer(new BasicLayer(new ActivationSigmoid(),false,cerebellum.size()));
 		prefrontalCortex.getStructure().finalizeStructure();
 		prefrontalCortex.reset();
 	}
 	
 	private void initializeWeights() {
-		int numWeightsNeeded = eyes.size() * motorControl.size();
+		int numWeightsNeeded = visualCortex.size() * cerebellum.size();
 		double [] weights = weightSource.getWeights(numWeightsNeeded);
-		for(int i = 0; i < eyes.size(); i++) {
-			for(int j = 0; j < motorControl.size(); j++) {
-				prefrontalCortex.setWeight(0, i, j, weights[i*motorControl.size()+j]);
+		for(int i = 0; i < visualCortex.size(); i++) {
+			for(int j = 0; j < cerebellum.size(); j++) {
+				prefrontalCortex.setWeight(0, i, j, weights[i*cerebellum.size()+j]);
 			}
 		}
 	}
@@ -61,9 +63,9 @@ public class MouseBrain implements SimpleWorldBrain<Unit> {
 		initializeWeights();
 	}
 	
-	public void hardCodeRule(VisualInput input, Direction [] path, MouseMove action) {
-		int eyeIndex = eyes.getNeuralIndex(input, path);
-		int motorIndex = motorControl.getNeuralIndex(action);
+	public void hardCodeRule(VisualInput input, Direction [] path, Action action) {
+		int eyeIndex = visualCortex.getNeuralIndex(input, path);
+		int motorIndex = cerebellum.getNeuralIndex(action);
 		prefrontalCortex.setWeight(0, eyeIndex, motorIndex, 1.0);
 	}
 	
@@ -72,11 +74,11 @@ public class MouseBrain implements SimpleWorldBrain<Unit> {
 	 * that input to compute a new output. Puts that output into neural outputs.
 	 */
 	public void think() {
-		List<Double> rawNeuralInput = eyes.getNextInput();
+		List<Double> rawNeuralInput = visualCortex.getNextInput();
 		BasicNeuralData neuralInput = EncogUtils.neuralDataFromListOfDouble(rawNeuralInput);
 		MLData neuralOutput = prefrontalCortex.compute(neuralInput);
 		List<Double> rawNeuralOutput = EncogUtils.doubleListFromNeuralOutput(neuralOutput);
-		motorControl.setOutput(rawNeuralOutput);
+		cerebellum.setOutput(rawNeuralOutput);
 	}
 
 	public Mouse getBody() {
@@ -86,17 +88,37 @@ public class MouseBrain implements SimpleWorldBrain<Unit> {
 	public String toString() {
 		StringBuilder result = new StringBuilder();
 		for(int outputIndex = 0; outputIndex < prefrontalCortex.getOutputCount(); outputIndex++) {
-			result.append(motorControl.getNameOfIndex(outputIndex));
+			result.append(cerebellum.getNameOfIndex(outputIndex));
 			result.append(":\n");
 			for(int inputIndex = 0; inputIndex < prefrontalCortex.getInputCount(); inputIndex++) {
 				result.append("\t");
 				result.append(prefrontalCortex.getWeight(0, inputIndex, outputIndex));
 				result.append(" - ");
-				result.append(eyes.getNameOfIndex(inputIndex));
+				result.append(visualCortex.getNameOfIndex(inputIndex));
 				result.append("\n");
 			}
 		}
 		return result.toString();
+	}
+
+	@Override
+	public Eyes getEyes() {
+		return visualCortex.getEyes();
+	}
+
+	@Override
+	public void setEyes(Eyes eyes) {
+		visualCortex.setEyes(eyes);
+	}
+
+	@Override
+	public MotorControl getMotorControl() {
+		return cerebellum.getMotorControl();
+	}
+
+	@Override
+	public void setMotorControl(MotorControl motorControl) {
+		cerebellum.setMotorControl(motorControl);
 	}
 	
 }

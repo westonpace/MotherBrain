@@ -4,43 +4,37 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import com.ptank.brain.world.simpleworld.MotorControl;
+import com.ptank.brain.world.simpleworld.MotorControl.Action;
 import com.ptank.brain.world.simpleworld.physical.Mouse;
-import com.ptank.util.event.Event.EventListener;
-import com.ptank.util.gridworld.Tile;
-import com.ptank.util.gridworld.UnitMoveEvent;
-import com.ptank.util.gridworld.World.Direction;
 
 /**
  * Translates a set of neurons into mouse movement.
  */
-public class MouseCerebellum implements NeuralOutput,EventListener<UnitMoveEvent> {
+public class MouseCerebellum implements NeuralOutput {
 
 	private static Logger logger = Logger.getLogger(MouseCerebellum.class);
 	
-	private Mouse mouse;
-	private Tile currentTile;
+	private MotorControl motorControl;
 	
 	public MouseCerebellum(Mouse mouse) {
-		this.mouse = mouse;
-		this.currentTile = null;
-		mouse.moveEvent.addListener(this);
+		this.motorControl = new MouseMotorControl(mouse);
 	}
 	
-	public MouseCerebellum(Mouse mouse, Tile currentTile) {
-		this.mouse = mouse;
-		this.currentTile = currentTile;
-		mouse.moveEvent.addListener(this);
+	public MouseCerebellum(MotorControl motorControl) {
+		this.motorControl = motorControl;
 	}
 	
-	public enum MouseMove {
-		ROTATE_LEFT,
-		ROTATE_RIGHT,
-		MOVE_FORWARD,
-		MOVE_BACKWARD;
+	public void setMotorControl(MotorControl motorControl) {
+		this.motorControl = motorControl;
+	}
+	
+	public MotorControl getMotorControl() {
+		return motorControl;
 	}
 	
 	public String getNameOfIndex(int index) {
-		return MouseMove.values()[index].toString();
+		return Action.values()[index].toString();
 	}
 	
 	@Override
@@ -59,50 +53,19 @@ public class MouseCerebellum implements NeuralOutput,EventListener<UnitMoveEvent
 		
 		//If all the values are negative then don't move
 		if(maxValue > 0) {
-			MouseMove move = MouseMove.values()[maxIndex];
-			makeMove(move);
+			Action move = Action.values()[maxIndex];
+			motorControl.doAction(move);
 		} else {
 			logger.debug("Standing Still");
 		}
 	}
-	
-	private void makeMove(MouseMove move) {
-		Direction moveDirection;
-		switch(move){
-		case MOVE_BACKWARD:
-			logger.debug("Moving Backwards");
-			moveDirection = mouse.getFacingDirection().combine(Direction.South);
-			mouse.move(moveDirection);
-			break;
-		case MOVE_FORWARD:
-			logger.debug("Moving Forwards");
-			moveDirection = mouse.getFacingDirection().combine(Direction.North);
-			mouse.move(moveDirection);
-			break;
-		case ROTATE_LEFT:
-			logger.debug("Turning Left");
-			mouse.turn(Direction.East);
-			break;
-		case ROTATE_RIGHT:
-			logger.debug("Turning Right");
-			mouse.turn(Direction.West);
-			break;
-		default:
-			throw new RuntimeException("No move action available for move: " + move);
-		}
-	}
-	
-	public int getNeuralIndex(MouseMove move) {
+		
+	public int getNeuralIndex(Action move) {
 		return move.ordinal();
 	}
 	
 	public int size() {
-		return MouseMove.values().length;
-	}
-
-	@Override
-	public void onEvent(UnitMoveEvent event) {
-		currentTile = event.getDestination();
+		return Action.values().length;
 	}
 
 }

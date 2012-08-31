@@ -5,23 +5,27 @@ import java.util.List;
 
 import com.ptank.brain.world.simpleworld.Eyes;
 import com.ptank.brain.world.simpleworld.Eyes.VisualInput;
-import com.ptank.brain.world.simpleworld.mental.mouse.MouseEyes.TileIterator;
-import com.ptank.brain.world.simpleworld.physical.Cat;
-import com.ptank.brain.world.simpleworld.physical.Cheese;
 import com.ptank.brain.world.simpleworld.physical.Mouse;
-import com.ptank.util.event.Event.EventListener;
-import com.ptank.util.gridworld.Tile;
-import com.ptank.util.gridworld.UnitMoveEvent;
 import com.ptank.util.gridworld.World.Direction;
 
 public class MouseVisualCortex implements NeuralInput {
 
-	private Mouse mouse;
 	private Eyes eyes;
 		
 	public MouseVisualCortex(Mouse mouse) {
-		this.mouse = mouse;
 		this.eyes = new MouseEyes(mouse);
+	}
+	
+	public MouseVisualCortex(Eyes eyes) {
+		this.eyes = eyes;
+	}
+	
+	public void setEyes(Eyes eyes) {
+		this.eyes = eyes;
+	}
+	
+	public Eyes getEyes() {
+		return eyes;
 	}
 	
 	@Override
