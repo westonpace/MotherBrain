@@ -28,5 +28,9 @@ public class FacingUnit extends Unit {
 	public void turn(Direction directionToTurn) {
 		facingDirection = facingDirection.combine(directionToTurn);
 	}
+
+	public void face(Direction directionToFace) {
+		facingDirection = directionToFace;
+	}
 	
 }

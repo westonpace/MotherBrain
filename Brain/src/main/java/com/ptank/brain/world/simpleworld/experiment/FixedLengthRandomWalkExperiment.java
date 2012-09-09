@@ -21,6 +21,11 @@ public class FixedLengthRandomWalkExperiment implements Experiment {
 	public FixedLengthRandomWalkExperiment(SimpleWorld world) {
 		this.world = world;
 	}
+	
+	public FixedLengthRandomWalkExperiment(SimpleWorld world, int numTurns) {
+		this.world = world;
+		this.numTurns = numTurns;
+	}
 		
 	@Override
 	public void runExperiment() {
@@ -28,6 +33,7 @@ public class FixedLengthRandomWalkExperiment implements Experiment {
 		for(int i = 0; i < numTurns; i++) {
 			world.tick();
 		}
+		world.clear();
 	}
 	
 }

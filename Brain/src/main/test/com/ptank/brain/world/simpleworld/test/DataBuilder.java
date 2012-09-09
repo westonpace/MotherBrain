@@ -3,6 +3,7 @@ package com.ptank.brain.world.simpleworld.test;
 import com.ptank.brain.world.simpleworld.mental.mouse.MouseBrain;
 import com.ptank.brain.world.simpleworld.mental.mouse.MouseVisualCortex;
 import com.ptank.brain.world.simpleworld.mental.mouse.MouseCerebellum;
+import com.ptank.brain.world.simpleworld.mental.mouse.NeuralNoise;
 import com.ptank.brain.world.simpleworld.physical.Mouse;
 
 public class DataBuilder {
@@ -19,11 +20,11 @@ public class DataBuilder {
 		return new MouseCerebellum(buildMouse());
 	}
 	
-	public MouseBrain buildRandomMouseBrain() {
+	public MouseBrain buildRandomMouseBrain(boolean useBias, double noiseMagnitude) {
 		Mouse mouse = buildMouse();
 		MouseVisualCortex eyes = new MouseVisualCortex(mouse);
 		MouseCerebellum motorControl = new MouseCerebellum(mouse);
-		MouseBrain result = new MouseBrain(mouse,eyes,motorControl);
+		MouseBrain result = new MouseBrain(mouse,eyes,motorControl,useBias,noiseMagnitude);
 		return result;
 	}
 		
